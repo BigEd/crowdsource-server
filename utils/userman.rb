@@ -44,6 +44,7 @@ when /^c/
     target.hashpass = Digest::SHA1.hexdigest(randpass+target.salt)
 
     if target.save
+      puts randpass
     else 
       @errors = "Failed to reset password, please contact a TA"
     end 
