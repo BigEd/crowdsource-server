@@ -34,7 +34,7 @@ class Chip
   property :maxx,         Integer
   property :maxy,         Integer
 
-  property :created_at, Time
+  property :created_at, DateTime
 end
 
 class Layer
@@ -47,7 +47,7 @@ class Layer
   property :long_text,    String
   property :thumbnail,    String
   
-  property :created_at, Time
+  property :created_at, DateTime
 end
 
 class Tile
@@ -91,7 +91,7 @@ class Submission
   property :bonus,          Integer
   
 
-  property :created_at, Time
+  property :created_at, DateTime
 end
 
 class Line
@@ -99,5 +99,5 @@ class Line
   property :id,             Serial
   property :submission_id,  Integer
   property :data,           String
-  property :created_at, Time
+  property :created_at, DateTime
 end

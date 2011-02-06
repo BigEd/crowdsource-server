@@ -337,22 +337,6 @@ get '/user/tile/:layer_id/:x/:y' do
   redirect "/tiles/#{layer.chip_id}/#{@tile.y_coord}-#{@tile.x_coord}#{layer.itype}.png"
 end
 
-=begin
-class Tile
-  include DataMapper::Resource
-  property :id,       Serial
-  property :layer_id, Integer
-  property :minx,     Integer
-  property :miny,     Integer
-  property :sizex,    Integer
-  property :sizey,    Integer
-
-  property :jpeg,       String
-  property :png,        String
-  property :thumbnail,  String
-
-end
-=end
 ########################
 ### Game and Submissions
 get '/user/game' do
