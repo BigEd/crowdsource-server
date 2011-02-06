@@ -4,7 +4,6 @@ require 'digest/sha1'
 require 'termios'
 require 'models'
 require 'pp'
-require 'pony'
 
 ###
 def help
@@ -45,22 +44,6 @@ when /^c/
     target.hashpass = Digest::SHA1.hexdigest(randpass+target.salt)
 
     if target.save
-      Pony.mail :to => target.email,
-                :from => "keith.alexander@nsa.gov",
-                :subject => "NSA, CIA, FBI, DOD, DOHS, SS RE: MDA904",
-                :body => "Hi, this is your password for intruded.net:4567: '#{randpass}'.\n"\
-                         "Please log in and change it ASAP.\n"\
-                         "Your username is #{target.name}\n",
-                :via=>:smtp,
-                :smtp => {
-                  :host=>'smtp.gmail.com',
-                  :port=>'587',
-                  :tls=>true,
-                  :user=>'sk8rs.drping.from.roflcopters@gmail.com',
-                  :password=>'lolcatsunite',
-                  :auth=>:plain,
-                  :domain=>"gmail.com"
-                }
     else 
       @errors = "Failed to reset password, please contact a TA"
     end 
