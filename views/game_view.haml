@@ -8,7 +8,7 @@
   %div{:class=>"frame", :id=>"frame"}
     %div{:class=>"chip"}
       %script
-        document.write('<img width=700 height=550 src="tiles/1/#{session[:y]}-#{session[:x]}#{@layer.itype}.png">\n');
+        document.write('<img width=700 height=550 src="/tiles/1/#{session[:y]}-#{session[:x]}#{@layer.itype}.png">\n');
       %canvas{:class=>"chip", :id=>"rectlayer"}
       %canvas{:class=>"chip", :id=>"mouselayer"}
       %canvas{:class=>"chip", :id=>"hitbuffer"}
