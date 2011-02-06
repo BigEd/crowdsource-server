@@ -29,8 +29,8 @@ class Chip
   include DataMapper::Resource
   property :id,           Serial
   property :name,         String
-  property :wikiURL,      String
-  property :description,  String
+  property :wikiURL,      Text
+  property :description,  Text
   property :maxx,         Integer
   property :maxy,         Integer
 
@@ -43,9 +43,9 @@ class Layer
   property :name,         String
   property :chip_id,      Integer
   property :itype,        String
-  property :short_text,   String
-  property :long_text,    String
-  property :thumbnail,    String
+  property :short_text,   Text
+  property :long_text,    Text
+  property :thumbnail,    Text
   
   property :created_at, DateTime
 end
@@ -65,9 +65,9 @@ class Tile
   property :sizex,    Integer
   property :sizey,    Integer
 
-  property :jpeg,       String
-  property :png,        String
-  property :thumbnail,  String
+  property :jpeg,       Text
+  property :png,        Text
+  property :thumbnail,  Text
 
 end
 
@@ -85,7 +85,7 @@ class Submission
   property :id,             Serial
   property :user_id,        Integer
   property :tile_id,        Integer
-  property :rawdata,        String
+  property :rawdata,        Text
   property :state,          String
   property :quality_factor, Integer
   property :initial_score,  Integer
@@ -99,6 +99,6 @@ class Line
   include DataMapper::Resource
   property :id,             Serial
   property :submission_id,  Integer
-  property :data,           String
+  property :data,           Text
   property :created_at, DateTime
 end

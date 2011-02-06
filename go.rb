@@ -403,8 +403,9 @@ put '/submission/:user_id/:sub_id' do
   
   if s
     data = request.body.read
-    s.rawdata = data    
+    s.rawdata = data
     if not s.save
+      pp s.errors
       redirect '/', 500
     end
   else
