@@ -86,6 +86,7 @@ class Submission
   property :user_id,        Integer
   property :tile_id,        Integer
   property :rawdata,        String
+  property :state,          String
   property :quality_factor, Integer
   property :initial_score,  Integer
   property :bonus,          Integer

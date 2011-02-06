@@ -11,7 +11,7 @@ require 'models'
 
 itypes = ['p','t']
 xrange = 0..9
-yrange = 0..12
+yrange = 0..1
 
 # 700 × 550 png images
 xwidth = 700

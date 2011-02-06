@@ -3,4 +3,23 @@ Are you ready to play #{@user.real_name} [#{@user.name}]?
 You currently have #{@user.points} points.
 %br
 %h2
-  %a{:href => "/user/game/new_tile"} Generate Tile
+  Pending tile submissions:
+- @pending.all.each do |sub|
+  %div{:id=>"submission"}
+    %a{:href=>"/user/submission/load/#{sub.id}"} View
+    %span{:id=>"submission_id"} ID #{sub.id}
+    %span{:id=>"submission_state"}  #{sub.state}
+    %span
+    %a{:href=>"/user/submission/delete/#{sub.id}"} Delete
+  %br
+%h2
+  Complete tile submissions:
+  - @complete.all.each do |sub|
+    %div{:id=>"submission"}
+      %span{:id=>"submission_id"} ID #{sub.id}
+      %span{:id=>"submission_state"}  #{sub.state}
+      %a{:href=>"/user/submission/delete/#{sub.id}"} Delete
+    %br
+
+%h2
+  %a{:href => "/user/game/new_tile"} Generate New Tile

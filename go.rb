@@ -235,8 +235,8 @@ end
 get '/user/chip/:id/:layer' do
   @chip = Chip.first(:id =>params[:id])
   @layer = Layer.first(:id => params[:layer])
-  session[:x] ||= 0
-  session[:y] ||= 0
+  session[:x] ||= 1
+  session[:y] ||= 1
   haml :chip_view
 end
 
@@ -256,8 +256,8 @@ get '/user/chip/:id/:layer/:direction' do
   elsif params[:direction] == "down"
     session[:y] += 1
   elsif params[:direction] == "start"
-    session[:x] = 0
-    session[:y] = 0
+    session[:x] = 1
+    session[:y] = 1
   end
   haml :chip_view
 end
@@ -334,12 +334,14 @@ get '/user/tile/:layer_id/:x/:y' do
     redirect '/tiles/missing.png'
   end
   
-  redirect "//tiles/#{layer.chip_id}/#{@tile.y_coord}-#{@tile.x_coord}#{layer.itype}.png"
+  redirect "/tiles/#{layer.chip_id}/#{@tile.y_coord}-#{@tile.x_coord}#{layer.itype}.png"
 end
 
 ########################
 ### Game and Submissions
 get '/user/game' do
+  @pending = Submission.all(:user_id=>@user.id, :state=> "pending")
+  @complete = Submission.all(:user_id=>@user.id, :state=> "complete")
   haml :game_index
 end
 
@@ -347,25 +349,61 @@ get '/user/game/new_tile' do
   #pick a random layer on a random chip
   @layer = (Layer.all.sort_by {rand}).first
   @tile = (Tile.all(:layer_id=>@layer.id).sort_by {rand}).first
+  @sub = Submission.create
+
+  @sub.state = "pending"
+  @sub.user_id = @user.id
+  @sub.tile_id = @tile.id
+  @sub.quality_factor = 0
+  @sub.initial_score = 0
+  @sub.bonus = 0
+  
+  @sub.save
+  
   session[:x] = @tile.x_coord
   session[:y] = @tile.y_coord
   haml :game_view
 end
 
-put '/submission/:user_id/:tile_id' do
-  tile = Tile.first(params[:tile_id])
-  user = User.first(params[:user_id])
+get '/user/submission/load/:sub_id' do
+  @sub = Submission.first(:user_id=>@user.id, :id=>params[:sub_id])
+  if @sub
+    @tile = Tile.first(:id=>@sub.tile_id)
+    @layer = Layer.first(:id=>@tile.layer_id)
+    session[:x] = @tile.x_coord
+    session[:y] = @tile.y_coord
+    haml :game_view
+  else
+    @errors = "could not find submission"
+    redirect '/user/game'
+  end
+end
+
+get '/user/submission/delete/:sub_id' do
+  sub = Submission.first(:user_id=>@user.id, :id=>params[:sub_id])
+  if sub
+    sub.destroy
+  else
+    @errors = "could not find submission"
+  end
+  redirect '/user/game'
+end
+
+get '/submission/:user_id/:sub_id' do
+ #load tile info
+ s = Submission.first(:id=>params[:sub_id], :user_id=>params[:user_id])
+
+ redirect '/', 400 if not s
+
+ s.rawdata #oh jaa
+end
+
+put '/submission/:user_id/:sub_id' do
+  s = Submission.first(:id=>params[:sub_id], :user_id=>params[:user_id])  
   
-  if tile and user
+  if s
     data = request.body.read
-    puts tile
-    s = Submission.create
-    s.user_id = user.id
-    s.tile_id = tile.id
-    s.rawdata = data
-    s.quality_factor = 0
-    s.initial_score = 0
-    s.bonus = 0
+    s.rawdata = data    
     if not s.save
       redirect '/', 500
     end
@@ -376,8 +414,7 @@ put '/submission/:user_id/:tile_id' do
   "OK"  
 end
 
-#  users submit annotations for each tile
-
+#######################
 helpers do
   def error(str)
     @errors = str

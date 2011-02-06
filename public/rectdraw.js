@@ -202,10 +202,10 @@ function dist(x1,y1,x2,y2){return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));}
 //
 /////////////////////////
 
-function loadTile(filename){
+function loadTile(user_id, sub_id){
   var request=new XMLHttpRequest()
   request.onreadystatechange=function(){tileLoaded(request);}
-  request.open('GET','rects/'+filename+'.txt',true)
+  request.open('GET','/submission/'+user_id+'/'+sub_id,true)
   request.send(null);
 }
 
@@ -224,16 +224,16 @@ function parseInts(a){
 	for(var i=1;i<a.length;i++) a[i]=parseInt(a[i]);
 }
 
-function submit(user_id, tile_id){
+function submit(user_id, sub_id){
   data = rectsString();
   //data += "rectlayer: "+rectlayer.toDataURL("image/png");+"\r\n";
-	saveTile(user_id, tile_id, data);
+	saveTile(user_id, sub_id, data);
 }
 
-function saveTile(user_id, tile_id, str){
+function saveTile(user_id, sub_id, str){
 	var request = new XMLHttpRequest();
 	request.onreadystatechange=function(){tileSaved(request);};
-	request.open('PUT', '/submission/'+user_id+'/'+tile_id, true);
+	request.open('PUT', '/submission/'+user_id+'/'+sub_id, true);
 	request.setRequestHeader("Content-Type", 'text/plain');
 //	request.setRequestHeader("Cookie", document.cookie); //not allowed
 	request.send(str);
