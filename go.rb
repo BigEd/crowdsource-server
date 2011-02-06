@@ -334,7 +334,7 @@ get '/user/tile/:layer_id/:x/:y' do
     redirect '/tiles/missing.png'
   end
   
-  redirect "/tiles/#{layer.chip_id}/#{@tile.y_coord}-#{@tile.x_coord}#{layer.itype}.png"
+  redirect "//tiles/#{layer.chip_id}/#{@tile.y_coord}-#{@tile.x_coord}#{layer.itype}.png"
 end
 
 ########################

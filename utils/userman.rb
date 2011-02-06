@@ -88,6 +88,7 @@ when /^a/
   end
 when /^m/
   unless ARGV[1] == nil
+    puts ARGV[1]
     @user = User.first(:name => ARGV[1])
     @user.admin = true
     if @user.save  
