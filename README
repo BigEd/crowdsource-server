@@ -9,10 +9,12 @@ corresponding to the photographs.  The photographs are huge, and it
 takes a few months of hobbyist time to go over every square micron and
 trace the outlines of each shape on each layer. 
 
-This, the crowdsource-polygons project mastered at
-https://github.com/trebonian/crowdsource-polygons, aims to accelerate
-the capturing of polygons, by casting it as a simple online game and
-making it fun. 
+This, the crowdsource-server project mastered at
+  https://github.com/adc/crowdsource-server
+together with the crowdsource-polygons (client) project mastered at
+  https://github.com/trebonian/crowdsource-polygons
+aims to accelerate the capturing of polygons, by casting it as a
+simple online game and making it fun. 
 
 The aim is to have a single page somewhere like
 http://visual6502.org/crowdsource.html which presents a photo of a
@@ -34,10 +36,21 @@ As a secondary goal, we might try to make this single-page polygon
 capture tool work on touchpad or handheld devices. Desktop is the
 primary platform (unless the other is really easy)
 
-Most of the complexity will be on the server side: that code will also
-be developed within this project but can only be tested with a
-suitable server setup. Probably github's gh-pages feature won't let us
-test server side computation. 
+Most of the complexity will be on the server side. A suitable server
+setup will allow local testing - github's gh-pages won't host complex
+servers. 
+  ruby -rubygems go.rb
+will listen on port 4567 and will require these packages
+  apt-get install libsqlite3-dev libsinatra-ruby ruby rubygems
+  gem install sinatra
+  gem install dm-core dm-validations dm-timestamps dm-sqlite-adapter
+  gem install haml fast-aes
+
+There's a command line tool for user management
+  ruby ./userman.rb
+which requires
+  gem install termios pony
+(At least one admin and one ordinary user will be needed)
 
 We'll have a more detailed design document elsewhere.
 
@@ -49,7 +62,7 @@ will apply.
 This project is associated with the visualchips project at visual6502.org
 
 /*
- Copyright (c) 2011 Brian Silverman, Barry Silverman, Ed Spittles
+ Copyright (c) 2011 Brian Silverman, Barry Silverman, Ed Spittles, Alex C
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
