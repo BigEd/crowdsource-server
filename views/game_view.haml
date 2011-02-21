@@ -5,14 +5,21 @@
   - if @layer
     Now showing layer: @#{@layer.id} |  #{@layer.name} | #{@layer.long_text}
     %br
+    - if @sub.initial_score != 0
+      Initial Score: #{@sub.initial_score}
+      Bonus Score: #{@sub.bonus_score}
+      Quality Factor: #{@sub.quality_factor}
   %div{:class=>"frame", :id=>"frame"}
+    %hr
+    %button{:style=>"asdf2", :onclick=>"javascript:loadTile(#{@user.id},#{@sub.id});"} Reload
+    %button{:style=>"asdf2", :onclick=>"javascript:submit(#{@user.id},#{@sub.id});"} Save & Score
     %div{:class=>"chip"}
       %script
         document.write('<img width=700 height=550 src="/tiles/1/#{session[:y]}-#{session[:x]}#{@layer.itype}.png">\n');
       %canvas{:class=>"chip", :id=>"rectlayer"}
       %canvas{:class=>"chip", :id=>"mouselayer"}
       %canvas{:class=>"chip", :id=>"hitbuffer"}
-    %button{:class=>"chip", :onclick=>"javascript:submit(#{@user.id},#{@sub.id});"} Save #{@tile.id}
+    %button{:class=>"chip", :onclick=>"javascript:save(#{@user.id},#{@sub.id});"} Save #{@tile.id}
 %script{:type => "text/javascript", :src => "/rectdraw.js"}
 %script
   setup();

@@ -8,6 +8,7 @@
         %a{:href => chip.wikiURL} #{chip.wikiURL}
       - if @user.admin
         %a{:href => "/admin/chip/edit/#{chip.id}"} Edit Chip
+        %a{:href => "/admin/chip/export/#{chip.id}"} Export Chip
       %br
       %h2
         %a{:href => "/user/chip/#{chip.id}"} View Chip
@@ -15,4 +16,3 @@
 - if @user.admin
   %br
   %a{:href => "/admin/chip/edit/new"} Create New Chip
-      

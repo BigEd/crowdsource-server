@@ -9,6 +9,8 @@ require 'models'
 require 'time'
 require 'pp'
 require 'fast-aes'
+require 'clipper'
+
 @@secret = FastAES.new("changemechangmec")
 enable :sessions
 
@@ -291,6 +293,18 @@ get '/admin/chip/delete/:id' do
   redirect '/user/chips'
 end
 
+get '/admin/chip/export/:id' do
+  #dump out file of rectangle information
+  @chip = Chip.first(:id => params[:id])  
+  if @chip
+    @best_layers = get_best_submissions(@chip)
+  else
+    @errors = "Wrong chip id"
+    redirect '/user/chips/'
+  end
+  haml :best_tiles
+end
+
 get '/admin/layer/edit/:chipid/:id' do
   chip = Chip.first(:id =>params[:chipid])
   if params[:id] == "new"
@@ -356,7 +370,7 @@ get '/user/game/new_tile' do
   @sub.tile_id = @tile.id
   @sub.quality_factor = 0
   @sub.initial_score = 0
-  @sub.bonus = 0
+  @sub.bonus_score = 0
   
   @sub.save
   
@@ -377,6 +391,22 @@ get '/user/submission/load/:sub_id' do
     @errors = "could not find submission"
     redirect '/user/game'
   end
+end
+
+get '/user/submission/submit/:sub_id' do
+  @sub = Submission.first(:user_id=>@user.id, :id=>params[:sub_id])
+  if @sub
+    score_submission(@sub)
+    @sub.state = "complete"
+    if @sub.save
+      redirect "/user/submission/load/#{@sub.id}"
+    else
+      @errors = 'failed to save score'
+    end
+  else
+    @errors = "could not find submission"
+  end
+  redirect '/user/game'
 end
 
 get '/user/submission/delete/:sub_id' do
@@ -460,4 +490,124 @@ helpers do
     end
     false
   end
+
+
+########################
+#tile submission scoring
+
+class Numeric
+  def degrees
+    #monkey patch conversion
+    self * Math::PI / 180
+  end
+end
+
+  def to_rects(rawdata)
+    shapes = []
+
+    rawdata.lines do |line|
+      parts = line.split
+      if parts[0] == 'l'
+        #form is X1, Y1    X2, Y2,    width
+        xA,yA,xB,yB,width = parts[1..-1].map(&:to_i)
+
+        yA += 0.00001 if yA == yB
+        xA += 0.00001 if xA == xB
+                  
+        h = ((xA-xB)**2 + (yA-yB)**2)**0.5
+        angle1 = Math::asin((yB-yA)/h)
+        angle2 = Math::PI/2.0 - angle1
+        
+        widthA = width*0.5 * Math::cos(angle2)
+        widthB = width*0.5 * Math::tan(angle2)
+        
+        x1 = xA - widthA
+        y1 = yA - widthB
+        x2 = xA + widthA
+        y2 = xA + widthB
+        x3 = xB - widthA
+        y3 = yB - widthB
+        x4 = xB + widthA
+        y4 = xB + widthB
+        
+        shapes.push [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+      elsif parts[0] == 'r'
+        #form is X1, Y1    X2, Y2
+        x1,y1,x2,y2 = parts[1..-1].map(&:to_i)
+        x3 = x2
+        y3 = y1
+        x4 = x1
+        y4 = y2        
+        shapes.push [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+      else
+        raise "unknown type..."
+      end
+
+    end
+    return shapes
+  end
+  
+  def get_width_defects(sub)
+    
+  end
+  
+  def get_overlap_defects(shapes)
+    defect = []
+    (0..shapes.count-1).each do |i|
+      (0..i-1).each do |j|
+        c = Clipper::Clipper.new
+        c.add_subject_polygon(shapes[i])
+        c.add_clip_polygon(shapes[j])
+        ret = c.intersection :non_zero, :non_zero
+
+        defect.push ret if not ret.empty?
+      end
+    end
+    pp defect
+    puts "^^^^"
+    return defect
+  end
+  
+  def score_submission(sub)
+    #@sub.quality_factor = 0
+    #@sub.initial_score = 
+    #@sub.bonus_score = 0
+    
+    #this sets the initial score
+    score = 50
+    
+    shapes = to_rects(sub.rawdata)
+
+=begin
+    Spacing error - a gap is too small (two edges too close together)
+    Width error - a feature is too small (two edges too close together)
+    Redundancy - a shape is entirely covered by other shapes
+    Too many or too few polygons, or rectangles (according to some broad range specific to the chip and layer)
+=end
+    #spacing_errors = get_spacing_defects()
+    width_errors = get_width_defects(shapes)
+    overlap_errors = get_overlap_defects(shapes)
+    
+    defect_penalty = 0
+    defect_penalty += overlap_errors.count*10 if overlap_errors
+    defect_penalty += width_errors.count*10 if width_errors
+
+    score -= defect_penalty
+    sub.initial_score = score
+    sub.quality_factor = score
+  end
+########################
+#tile exporting
+  def get_best_submissions(chip)
+    layers_out = {}
+    Layer.all(:chip_id=>chip.id).each do |layer|
+      layers_out[layer.id] = []
+      Tile.all(:layer_id=>layer.id).each do |tile|
+        choices = Submission.all(:state=>"complete", :tile_id => tile.id).sort_by {:quality_factor}
+        layers_out[layer.id].push choices[0]
+      end
+    end
+    layers_out
+  end
+  
 end
