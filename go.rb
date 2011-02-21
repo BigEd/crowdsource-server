@@ -293,17 +293,36 @@ get '/admin/chip/delete/:id' do
   redirect '/user/chips'
 end
 
+get '/admin/chip/export/:id/*' do
+  #dump out file of rectangle information
+  @chip = Chip.first(:id => params[:id])  
+  if @chip
+    @layers_out = get_best_submissions(@chip)
+  else
+    @errors = "Wrong chip id"
+    redirect '/user/chips/'
+  end
+
+  if params[:splat][0].match(/txt/)
+    return dump_layers_txt(@layers_out)
+  end
+
+  haml :best_tiles
+end
+
+
 get '/admin/chip/export/:id' do
   #dump out file of rectangle information
   @chip = Chip.first(:id => params[:id])  
   if @chip
-    @best_layers = get_best_submissions(@chip)
+    @layers_out = get_best_submissions(@chip)
   else
     @errors = "Wrong chip id"
     redirect '/user/chips/'
   end
   haml :best_tiles
 end
+
 
 get '/admin/layer/edit/:chipid/:id' do
   chip = Chip.first(:id =>params[:chipid])
@@ -561,7 +580,7 @@ end
   
   def get_overlap_defects(shapes)
     defect = []
-    p shapes
+    #p shapes
     (0..shapes.count-1).each do |i|
       (0..i-1).each do |j|
         c = Clipper::Clipper.new
@@ -572,9 +591,9 @@ end
         defect.push ret if not ret.empty?
       end
     end
-    puts 'vvvv'
-    pp defect
-    puts "^^^^"
+    #puts 'vvvv'
+    #pp defect
+    #puts "^^^^"
     return defect
   end
   
@@ -614,10 +633,32 @@ end
       layers_out[layer.id] = []
       Tile.all(:layer_id=>layer.id).each do |tile|
         choices = Submission.all(:state=>"complete", :tile_id => tile.id).sort_by {:quality_factor}
-        layers_out[layer.id].push choices[0]
+        layers_out[layer.id].push choices[0] if choices[0]
       end
     end
     layers_out
   end
   
+  def dump_layers_txt(layers)
+    o = "<pre>"
+    layers.each do |idx_layer|
+      idx, layer = idx_layer
+      layer.each do |submission|
+        tile = Tile.first(:id=>submission.tile_id)
+        lay = Layer.first(:id=>tile.layer_id)
+        
+        o += "ID: #{submission.id}\r\n"
+        o += "Init Score: #{submission.initial_score}\r\n"
+        o += "Bonus Score: #{submission.bonus_score}\r\n"
+        o += "Qual Factor: #{submission.quality_factor}\r\n"
+        o += "X: #{tile.x_coord}\r\n"
+        o += "Y: #{tile.y_coord}\r\n"
+        o += "Layer: #{lay.name}\r\n"
+        o += "Data:\r\n"
+        o += "#{submission.rawdata}"
+        o += "\r\n"
+      end
+    end
+    return o+"</pre>"
+  end
 end
