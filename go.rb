@@ -543,8 +543,10 @@ end
         x3 = x2
         y3 = y1
         x4 = x1
-        y4 = y2        
-        shapes.push [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+        y4 = y2    
+        #urgh, orientation matters TL, TR, BL, BR assumed
+        #TODO: orient around center point across a diagonal    
+        shapes.push [[x1,y1],[x3,y3],[x2,y2],[x4,y4]]
       else
         raise "unknown type..."
       end
@@ -559,16 +561,18 @@ end
   
   def get_overlap_defects(shapes)
     defect = []
+    p shapes
     (0..shapes.count-1).each do |i|
       (0..i-1).each do |j|
         c = Clipper::Clipper.new
-        c.add_subject_polygon(shapes[i])
-        c.add_clip_polygon(shapes[j])
+        c.add_subject_polygon(shapes[j])
+        c.add_clip_polygon(shapes[i])
         ret = c.intersection :non_zero, :non_zero
 
         defect.push ret if not ret.empty?
       end
     end
+    puts 'vvvv'
     pp defect
     puts "^^^^"
     return defect
