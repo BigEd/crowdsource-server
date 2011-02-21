@@ -524,11 +524,17 @@ end
         x1 = xA - widthA
         y1 = yA - widthB
         x2 = xA + widthA
-        y2 = xA + widthB
+        y2 = yA + widthB
         x3 = xB - widthA
         y3 = yB - widthB
         x4 = xB + widthA
-        y4 = xB + widthB
+        y4 = yB + widthB
+        
+        puts '====='
+        pp xA,yA,"--",xB,yB
+        pp [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+        puts '====='
+        
         
         shapes.push [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
       elsif parts[0] == 'r'
