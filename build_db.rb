@@ -1,4 +1,4 @@
-v#!/usr/bin/env ruby
+#!/usr/bin/env ruby
 require 'rubygems'
 require 'dm-core'
 require 'dm-validations'
@@ -14,5 +14,5 @@ DataMapper::Logger.new(STDOUT, :debug)
 #Chip.auto_migrate!
 #Layer.auto_migrate!
 #Tile.auto_migrate!
-#Submission.auto_migrate!
+Submission.auto_migrate!
 #Line.auto_migrate!

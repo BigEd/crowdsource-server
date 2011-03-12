@@ -18,6 +18,7 @@ You currently have #{@user.points} points.
     %div{:id=>"submission"}
       %span{:id=>"submission_id"} ID #{sub.id}
       %span{:id=>"submission_state"}  #{sub.state}
+      %a{:href=>"/user/submission/load/#{sub.id}"} View
       %a{:href=>"/user/submission/delete/#{sub.id}"} Delete
     %br
 

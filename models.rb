@@ -89,8 +89,8 @@ class Submission
   property :state,          String
   property :quality_factor, Integer
   property :initial_score,  Integer
-  property :bonus,          Integer
-  
+  property :bonus_score,          Integer
+  property :current_player_calibre,   Integer
 
   property :created_at, DateTime
 end

@@ -45,7 +45,7 @@ will listen on port 4567 and will require these packages
   gem install sinatra
   gem install dm-core dm-validations dm-timestamps dm-sqlite-adapter
   gem install haml fast-aes
-
+  gem install clipper
 There's a command line tool for user management
   ruby ./userman.rb
 which requires
